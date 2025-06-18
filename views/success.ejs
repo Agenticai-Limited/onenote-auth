@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authorization Successful</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="success-icon">✓</div>
+      <h1>Authorization Successful!</h1>
+
+      <% if (userEmail) { %>
+      <p>
+        We have successfully connected your account: <br /><strong
+          ><%= userEmail %></strong
+        >
+      </p>
+      <% } %>
+
+      <div class="permission-list">
+        <p>Our application now has permission to:</p>
+        <ul>
+          <li>✅ Access and manage your OneNote notebooks.</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        To provide continuous service and automatically sync your data without
+        requiring you to log in daily, we have obtained long-term access. You
+        can manage or disconnect this connection at any time in your Microsoft
+        account settings.
+      </div>
+
+      <!-- Optional: Link to a dashboard or a disconnect feature -->
+      <!-- <a href="/dashboard">Go to Dashboard</a> -->
+      <!-- <a href="/disconnect">Disconnect Service</a> -->
+    </div>
+  </body>
+</html>
