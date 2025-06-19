@@ -13,9 +13,10 @@ const { setupDatabase, saveUserAuthorization } = require("./database");
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const PORT = process.env.PORT || 3000;
+const DOMAIN = process.env.DOMAIN || "localhost";
 
 // Make sure this Redirect URI is added to your Microsoft Entra ID app registration
-const REDIRECT_URI = `http://localhost:${PORT}/partner/auth/microsoft/callback`;
+const REDIRECT_URI = `https://${DOMAIN}:${PORT}/partner/auth/microsoft/callback`;
 
 // Microsoft Authorization, Token, and Graph Endpoints
 const AUTHORITY = "https://login.microsoftonline.com/common";
@@ -34,8 +35,8 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "views"));
 
-// Serve static files from the "/public" directory, but under the "/partner" URL prefix
-app.use("/partner", express.static(path.join(__dirname, "..", "public")));
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, "..", "public")));
 
 // Set up the session middleware
 app.use(
@@ -48,15 +49,13 @@ app.use(
 
 // --- 3. DEFINE THE APPLICATION ROUTES ---
 
-const basePath = "/partner";
-
 // Route to display the branded landing page
-app.get(`${basePath}/onenote-auth`, (req, res) => {
-  res.render("index", { basePath });
+app.get("/partner/onenote-auth", (req, res) => {
+  res.render("index");
 });
 
 // Route to start the login process, now renamed to /authorize
-app.get(`${basePath}/authorize`, (req, res) => {
+app.get("/partner/authorize", (req, res) => {
   // Generate and store a random state value in the session for later validation
   const state = crypto.randomBytes(16).toString("hex");
   req.session.state = state;
@@ -78,7 +77,7 @@ app.get(`${basePath}/authorize`, (req, res) => {
 });
 
 // The callback route that handles the response from Microsoft
-app.get(`${basePath}/auth/microsoft/callback`, async (req, res) => {
+app.get("/partner/auth/microsoft/callback", async (req, res) => {
   const { code, state } = req.query;
 
   // Validate the state to prevent CSRF attacks
@@ -146,7 +145,7 @@ app.get(`${basePath}/auth/microsoft/callback`, async (req, res) => {
 
     // --- Step 4: Render the success page ---
     // In a real app, you might set a user session here and redirect
-    res.render("success", { userEmail: email, basePath });
+    res.render("success", { userEmail: email });
   } catch (error) {
     console.error(
       "Error during authentication callback:",
@@ -172,7 +171,7 @@ const startServer = async () => {
 
     // 4. Create an HTTPS server instead of an HTTP server
     https.createServer(sslOptions, app).listen(PORT, () => {
-      console.log(`Server is running securely on https://localhost:${PORT}`);
+      console.log(`Server is running securely on https://${DOMAIN}:${PORT}`);
       console.log(
         "Please open your browser and navigate to the address to begin."
       );
